@@ -36,4 +36,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     cd grav && \
     bin/grav install && \
 ## Install Admin Panel & DevTools
-    bin/gpm install -y admin devtools
+    bin/gpm install -y admin devtools && \
+## Doing the permission thing again
+    chmod 777 /var/www/ -R
