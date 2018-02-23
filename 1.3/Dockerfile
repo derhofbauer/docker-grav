@@ -38,4 +38,5 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 ## Install Admin Panel & DevTools
     bin/gpm install -y admin devtools && \
 ## Doing the permission thing again
-    chmod 777 /var/www/ -R
+    chmod 777 /var/www/ -R && \
+    chown www-data:www-data -R /var/www/
