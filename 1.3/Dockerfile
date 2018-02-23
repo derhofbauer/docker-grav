@@ -1,19 +1,21 @@
 FROM php:7-apache
 MAINTAINER Alexander Hofbauer <hofbauer.alexander@gmail.com>
 
+WORKDIR /var/www/html
+
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 #### Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
 
 ## Install stuff
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
-        git-core curl libxml2-dev libjpeg-dev libpng-dev libxpm-dev libxml2-dev libfreetype6-dev openssl && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git-core libxml2-dev libjpeg-dev libpng-dev libxpm-dev libxml2-dev libfreetype6-dev && \
 ## Enable mod_rewrite
-    a2enmod rewrite
+    a2enmod rewrite && \
 ## add PHP Exension
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
+    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
     docker-php-ext-install -j$(nproc) \
         ctype \
         dom \
@@ -26,13 +28,12 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
         zip && \
 
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /usr/src/*
+    rm -rf /var/lib/apt/lists/* /usr/src/* && \
 
 #### Install Grav
-COPY composer.json /var/www/html
-RUN chmod 777 /var/www/ -R && \
-    composer install
-
-RUN ln -s vendor/getgrav/grav && \
-    chmod 777 . -R
-RUN cd grav && bin/gpm install admin devtools
+    composer create-project getgrav/grav ./grav 1.3.* --no-scripts && \
+    chmod 777 /var/www/ -R && \
+    cd grav && \
+    bin/grav install && \
+## Install Admin Panel & DevTools
+    bin/gpm install -y admin devtools
